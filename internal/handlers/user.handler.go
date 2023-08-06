@@ -75,15 +75,15 @@ func (h *HandlerUser) GetDataUser(ctx *gin.Context) {
 
 func (h *HandlerUser) UpdateDataUser(ctx *gin.Context) {
 
-	file, err := ctx.FormFile("file")
-	log.Println("tesssssssssssss")
-	if err != nil {
-		log.Println("err: ", err)
-		return
-	} else {
-		log.Println("file: ", file.Filename)
+	// file, err := ctx.FormFile("file")
+	// log.Println("tesssssssssssss")
+	// if err != nil {
+	// 	log.Println("err: ", err)
+	// 	return
+	// } else {
+	// 	log.Println("file: ", file.Filename)
 
-	}
+	// }
 
 	var user models.User
 
