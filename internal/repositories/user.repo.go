@@ -37,7 +37,13 @@ func (r *RepoUser) CreateUser(data *models.User) (string, error) {
 }
 
 func (r *RepoUser) GetUser() (interface{}, error) {
-	query := `SELECT * 
+	query := `SELECT 
+		email,
+		first_name,
+		last_name,
+		phone_number,
+		address,
+		birth_date
 	FROM
 		public.user`
 
@@ -94,7 +100,11 @@ func (r *RepoUser) DeleteUser(data *models.User) (string, error) {
 		email = :email
 		`
 
-	_, err := r.NamedExec(query, data)
+	res, err := r.NamedExec(query, data)
+	rowsChange, err := res.RowsAffected()
+	if rowsChange == 0 {
+		return "data not found", nil
+	}
 	if err != nil {
 		return "", err
 	}

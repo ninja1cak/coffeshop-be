@@ -109,7 +109,9 @@ func (r *RepoProduct) GetProduct(limit string, page string, search string, sort 
 	if err != nil {
 		return "", "", err
 	}
-
+	if counts.Count == 0 {
+		return "data not found ", "", nil
+	}
 	lim, _ := strconv.Atoi(limit)
 	pag, _ := strconv.Atoi(page)
 	offset = lim * (pag - 1)
