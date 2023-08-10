@@ -77,6 +77,10 @@ func (r *RepoUser) UpdateUser(data *models.User) (string, error) {
 		set += "birth_date = :birth_date,"
 	}
 
+	if data.Photo_profile != nil {
+		set += "photo_profile = :photo_profile,"
+	}
+
 	set += "updated_at = NOW()"
 
 	query := fmt.Sprintf(`UPDATE public.user

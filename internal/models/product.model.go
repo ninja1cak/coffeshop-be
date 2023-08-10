@@ -9,7 +9,7 @@ type Product struct {
 	Product_stock       int        `db:"product_stock" form:"product_stock"`
 	Product_type        string     `db:"product_type" form:"product_type" json:"product_type"`
 	Product_slug        string     `db:"product_slug" form:"product_slug"`
-	Product_image       string     `db:"product_image" form:"product_image"`
+	Product_image       *string    `db:"product_image" form:"product_image"`
 	Isfavorite          bool       `db:"isfavorite" form:"isFavorite"`
 	Delivery_method     string     `db:"delivery_method" form:"delivery_method"`
 	Delivery_hour_start string     `db:"delivery_hour_start" form:"delivery_hour_start"`

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"ninja1cak/coffeshop-be/config"
 	"ninja1cak/coffeshop-be/internal/models"
 	"strconv"
 	"strings"
@@ -29,6 +30,7 @@ func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *model
 		product_desc,
 		product_stock,
 		product_type,
+		product_image,
 		delivery_method,
 		delivery_hour_start,
 		delivery_hour_end		
@@ -39,6 +41,7 @@ func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *model
 		:product_desc,
 		:product_stock,
 		:product_type,
+		:product_image,
 		array[:delivery_method],
 		:delivery_hour_start,
 		:delivery_hour_end	
@@ -83,7 +86,7 @@ func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *model
 	return "product success created", nil
 }
 
-func (r *RepoProduct) GetProduct(limit string, page string, search string, sort string) (interface{}, interface{}, error) {
+func (r *RepoProduct) GetProduct(limit string, page string, search string, sort string) (*config.Result, error) {
 	var offset int
 	var next int
 	var prev int
@@ -107,10 +110,10 @@ func (r *RepoProduct) GetProduct(limit string, page string, search string, sort 
 	err := r.Get(&counts, qCount)
 
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 	if counts.Count == 0 {
-		return "data not found ", "", nil
+		return &config.Result{Message: "data not found"}, nil
 	}
 	lim, _ := strconv.Atoi(limit)
 	pag, _ := strconv.Atoi(page)
@@ -127,13 +130,11 @@ func (r *RepoProduct) GetProduct(limit string, page string, search string, sort 
 		prev = pag - 1
 	}
 
-	var meta = map[string]interface{}{
-		"total": counts.Count,
-		"next":  next,
-		"prev":  prev,
+	var meta = config.Meta{
+		Next:  next,
+		Prev:  prev,
+		Total: counts.Count,
 	}
-
-	log.Println(meta)
 
 	query := fmt.Sprintf(`select 
 		p.product_name, 
@@ -158,10 +159,10 @@ func (r *RepoProduct) GetProduct(limit string, page string, search string, sort 
 	err = r.Select(&data, query)
 	log.Println(err)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	return data, meta, nil
+	return &config.Result{Data: data, Meta: meta}, nil
 }
 
 func (r *RepoProduct) UpdateProduct(dataProduct *models.Product, dataSize *models.Product_size) (string, error) {
@@ -213,7 +214,7 @@ func (r *RepoProduct) UpdateProduct(dataProduct *models.Product, dataSize *model
 		set += "delivery_hour_end = :delivery_hour_end,"
 	}
 
-	if dataProduct.Product_image != "" {
+	if *dataProduct.Product_image != "" {
 		set += "product_image = :product_image,"
 	}
 
@@ -250,7 +251,6 @@ func (r *RepoProduct) UpdateProduct(dataProduct *models.Product, dataSize *model
 		}
 
 	}
-
 	return "update product success", nil
 }
 

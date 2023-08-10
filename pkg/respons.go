@@ -8,10 +8,10 @@ import (
 
 type Response struct {
 	Code        int         `json:"-"`
-	Status      string      `json:"status"`
+	Status      int         `json:"status"`
+	Description interface{} `json:"description,omitempty"`
 	Meta        interface{} `json:"meta,omitempty"`
 	Data        interface{} `json:"data,omitempty"`
-	Description interface{} `json:"description,omitempty"`
 }
 
 func (r *Response) Send(ctx *gin.Context) {
@@ -22,8 +22,9 @@ func (r *Response) Send(ctx *gin.Context) {
 
 func NewResponse(code int, data *config.Result) *Response {
 	respon := Response{
-		Code:   code,
-		Status: getStatus(code),
+		Code:        code,
+		Status:      code,
+		Description: getStatus(code),
 	}
 
 	if respon.Code >= 400 {

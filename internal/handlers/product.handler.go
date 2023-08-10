@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"ninja1cak/coffeshop-be/internal/models"
 	"ninja1cak/coffeshop-be/internal/repositories"
+	"ninja1cak/coffeshop-be/pkg"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ func (h *HandlerProduct) PostDataProduct(ctx *gin.Context) {
 
 	var product models.Product
 	var productSize models.Product_size
-
+	product.Product_image = ctx.MustGet("image").(*string)
 	if err := ctx.ShouldBind(&product); err != nil {
 
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -72,7 +73,7 @@ func (h *HandlerProduct) GetDataProduct(ctx *gin.Context) {
 	if limit == "" {
 		limit = "3"
 	}
-	response, meta, err := h.GetProduct(limit, page, search, sort)
+	data, err := h.GetProduct(limit, page, search, sort)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
@@ -80,11 +81,7 @@ func (h *HandlerProduct) GetDataProduct(ctx *gin.Context) {
 		})
 
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": http.StatusOK,
-			"data":   response,
-			"meta":   meta,
-		})
+		pkg.NewResponse(200, data).Send(ctx)
 	}
 
 }
@@ -92,6 +89,7 @@ func (h *HandlerProduct) GetDataProduct(ctx *gin.Context) {
 func (h *HandlerProduct) UpdateDataProduct(ctx *gin.Context) {
 	var product models.Product
 	var productSize models.Product_size
+	product.Product_image = ctx.MustGet("image").(*string)
 
 	product.Product_slug = ctx.Param("product_slug")
 	if err := ctx.ShouldBind(&product); err != nil {
