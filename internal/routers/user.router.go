@@ -17,8 +17,8 @@ func user(g *gin.Engine, d *sqlx.DB) {
 	handler := handlers.NewUser(repo)
 
 	router.POST("/", handler.PostDataUser)
-	router.PATCH("/", middleware.UploadFile, handler.UpdateDataUser)
-	router.DELETE("/", handler.DeleteDataUser)
+	router.PATCH("/", middleware.IsVerify("user", "admin"), middleware.UploadFile, handler.UpdateDataUser)
+	router.DELETE("/", middleware.IsVerify("user", "admin"), handler.DeleteDataUser)
 	router.GET("/", handler.GetDataUser)
 	router.GET("/profile", middleware.IsVerify("user", "admin"), handler.GetDataUserLogin)
 

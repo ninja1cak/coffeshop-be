@@ -92,7 +92,7 @@ func (r *RepoUser) UpdateUser(data *models.User) (string, error) {
 		set += "birth_date = :birth_date,"
 	}
 
-	if data.Photo_profile != nil {
+	if *data.Photo_profile != "" {
 		set += "photo_profile = :photo_profile,"
 	}
 

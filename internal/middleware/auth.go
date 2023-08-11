@@ -15,14 +15,13 @@ func IsVerify(role ...string) gin.HandlerFunc {
 
 		if header = ctx.GetHeader("Authorization"); header == "" {
 			pkg.NewResponse(401, &config.Result{
-				Message: "Please login",
+				Data: "Please login",
 			}).Send(ctx)
 			return
 		}
-
 		if !strings.Contains(header, "Bearer") {
 			pkg.NewResponse(401, &config.Result{
-				Message: "Invalid header",
+				Data: "Invalid header",
 			}).Send(ctx)
 			return
 		}
@@ -31,7 +30,7 @@ func IsVerify(role ...string) gin.HandlerFunc {
 		check, err := pkg.VerifyToken(token)
 		if err != nil {
 			pkg.NewResponse(401, &config.Result{
-				Message: err.Error(),
+				Data: err.Error(),
 			}).Send(ctx)
 			return
 		}
@@ -44,11 +43,12 @@ func IsVerify(role ...string) gin.HandlerFunc {
 
 		if !valid {
 			pkg.NewResponse(401, &config.Result{
-				Message: "You not have permission to access",
+				Data: "You not have permission to access",
 			}).Send(ctx)
 			return
 		}
 		ctx.Set("user_id", check.Id)
+		ctx.Set("email", check.Email)
 		ctx.Next()
 	}
 }

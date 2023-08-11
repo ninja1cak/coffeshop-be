@@ -97,9 +97,10 @@ func (h *HandlerUser) UpdateDataUser(ctx *gin.Context) {
 
 	var user models.User
 	user.Photo_profile = ctx.MustGet("image").(*string)
-	log.Println("handler", user.Photo_profile)
+	user.Email = ctx.MustGet("email").(string)
 
-	user.Email = ctx.Query("email")
+	log.Println("handler", user.Photo_profile)
+	log.Println("email", user.Photo_profile)
 
 	if err := ctx.ShouldBind(&user); err != nil {
 		log.Println("tes:", err)
@@ -125,7 +126,9 @@ func (h *HandlerUser) UpdateDataUser(ctx *gin.Context) {
 
 func (h *HandlerUser) DeleteDataUser(ctx *gin.Context) {
 	var user models.User
-	user.Email = ctx.Query("email")
+
+	user.Email = ctx.MustGet("email").(string)
+
 	if err := ctx.ShouldBind(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
