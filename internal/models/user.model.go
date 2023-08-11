@@ -18,5 +18,6 @@ type User struct {
 	Status        *string    `db:"status" form:"status"`
 	Created_at    string     `db:"created_at" form:"created_at"`
 	Updated_at    *string    `db:"updated_at" form:"updated_at"`
+	Role          string     `db:"role"`
 	// File          *multipart.FileHeader `form:"file" binding:"required"`
 }
