@@ -76,6 +76,10 @@ FROM
 func (r *RepoUser) UpdateUser(data *models.User) (string, error) {
 	set := ""
 
+	if data.Password != "" {
+		set += "password = :password,"
+	}
+
 	if data.First_name != nil {
 		set += "first_name = :first_name,"
 	}

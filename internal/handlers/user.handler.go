@@ -96,14 +96,24 @@ func (h *HandlerUser) GetDataUser(ctx *gin.Context) {
 func (h *HandlerUser) UpdateDataUser(ctx *gin.Context) {
 
 	var user models.User
+	var err error
 	user.Photo_profile = ctx.MustGet("image").(*string)
 	user.Email = ctx.MustGet("email").(string)
 
-	log.Println("handler", user.Photo_profile)
-	log.Println("email", user.Photo_profile)
-
 	if err := ctx.ShouldBind(&user); err != nil {
 		log.Println("tes:", err)
+		return
+	}
+	if user.Password != "" {
+
+		user.Password, err = pkg.HashPassword(user.Password)
+
+	}
+
+	if err != nil {
+		pkg.NewResponse(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 	}
 
