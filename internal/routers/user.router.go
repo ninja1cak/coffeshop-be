@@ -19,7 +19,7 @@ func user(g *gin.Engine, d *sqlx.DB) {
 	router.POST("/", handler.PostDataUser)
 	router.PATCH("/", middleware.IsVerify("user", "admin"), middleware.UploadFile, handler.UpdateDataUser)
 	router.DELETE("/", middleware.IsVerify("user", "admin"), handler.DeleteDataUser)
-	router.GET("/", handler.GetDataUser)
+	router.GET("/", middleware.IsVerify("admin"), handler.GetDataUser)
 	router.GET("/profile", middleware.IsVerify("user", "admin"), handler.GetDataUserLogin)
 
 }
