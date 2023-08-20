@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -20,7 +21,7 @@ func NewProduct(db *sqlx.DB) *RepoProduct {
 	return &RepoProduct{db}
 }
 
-func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *models.Product_size) (string, error) {
+func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *models.Product_size) (*config.Result, error) {
 
 	dataProduct.Product_slug = strings.Join(strings.Split(dataProduct.Product_name, " "), "-")
 
@@ -50,7 +51,10 @@ func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *model
 	_, err := r.NamedExec(query, dataProduct)
 
 	if err != nil {
-		return "", err
+		if err.Error() == "pq: duplicate key value violates unique constraint \"product_product_slug_key\"" {
+			return nil, errors.New("Duplicate Products")
+		}
+		return nil, err
 	}
 
 	err = r.Get(dataSize, `SELECT product_id
@@ -60,7 +64,7 @@ func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *model
 		product_slug = $1`, dataProduct.Product_slug)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	log.Println("dataSize.ProductSizeSlice", dataSize.ProductSizeSlice)
@@ -79,11 +83,11 @@ func (r *RepoProduct) CreateProduct(dataProduct *models.Product, dataSize *model
 		)`
 		_, err = r.NamedExec(query, dataSize)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 	}
 
-	return "product success created", nil
+	return &config.Result{Data: "product success created"}, nil
 }
 
 func (r *RepoProduct) GetProduct(limit string, page string, search string, sort string) (*config.Result, error) {
@@ -154,7 +158,6 @@ func (r *RepoProduct) GetProduct(limit string, page string, search string, sort 
 		Product_type  string `db:"product_type"`
 		Size_price    string `db:"size_price"`
 	}{}
-	// data := []models.Product{}
 
 	err = r.Select(&data, query)
 	log.Println(err)

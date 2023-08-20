@@ -22,17 +22,22 @@ func (r *RepoUser) CreateUser(data *models.User) (string, error) {
 		email, 
 		password, 
 		phone_number,
-		role
+		role,
+		status
 		)
 	VALUES(
 		:email, 
 		:password, 
 		:phone_number,
-		:role
+		:role,
+		'pending'
 	)`
 
 	_, err := r.NamedExec(query, data)
 	if err != nil {
+		if err.Error() == "pq: duplicate key value violates unique constraint \"user_email_key\"" {
+			return "", errors.New("Email already registered.")
+		}
 		return "", err
 	}
 
@@ -137,7 +142,7 @@ func (r *RepoUser) DeleteUser(data *models.User) (string, error) {
 
 func (r *RepoUser) GetAuthData(email string) (*models.User, error) {
 	var result models.User
-	query := `SELECT user_id, email, password, role from public.user where email = ?`
+	query := `SELECT user_id, email, password, role, status from public.user where email = ?`
 
 	if err := r.Get(&result, r.Rebind(query), email); err != nil {
 		if err.Error() == "sql: no rows in result set" {
@@ -149,4 +154,18 @@ func (r *RepoUser) GetAuthData(email string) (*models.User, error) {
 
 	return &result, nil
 
+}
+
+func (r *RepoUser) UpdateStatusUser(email string) (string, error) {
+
+	query := `UPDATE public.user
+	SET
+		status = 'active'
+	WHERE
+		email = $1
+		`
+
+	result := r.MustExec(query, email)
+	log.Println(result)
+	return "Verify Success", nil
 }

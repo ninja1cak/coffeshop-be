@@ -38,6 +38,13 @@ func (h *HandlerAuth) Login(ctx *gin.Context) {
 		return
 	}
 
+	if *userFromDB.Status == "pending" {
+		pkg.NewResponse(401, &config.Result{
+			Data: "Your account is not verify",
+		}).Send(ctx)
+		return
+	}
+
 	if err := pkg.VerifyPassword(userFromDB.Password, user.Password); err != nil {
 		pkg.NewResponse(401, &config.Result{
 			Data: "wrong password",
@@ -49,6 +56,22 @@ func (h *HandlerAuth) Login(ctx *gin.Context) {
 	token, err := jwtt.Generate()
 	pkg.NewResponse(200, &config.Result{
 		Data: token,
+	}).Send(ctx)
+	return
+
+}
+
+func (h *HandlerAuth) VerifyAccount(ctx *gin.Context) {
+	token := ctx.Param("token")
+	check, err := pkg.VerifyToken(token)
+	if err != nil {
+		pkg.NewResponse(400, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
+	}
+	data, err := h.UpdateStatusUser(check.Email)
+	pkg.NewResponse(200, &config.Result{
+		Data: data,
 	}).Send(ctx)
 	return
 

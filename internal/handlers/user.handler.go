@@ -51,13 +51,18 @@ func (h *HandlerUser) PostDataUser(ctx *gin.Context) {
 
 	response, err := h.CreateUser(&user)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  http.StatusBadRequest,
-			"message": ctx.Error(err),
-		})
+		pkg.NewResponse(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 
 	} else {
+		jwtt := pkg.NewToken("", user.Email, "")
+		token, err := jwtt.Generate()
+		if err != nil {
+			return
+		}
+		pkg.SendMail(user.Email, token)
 		ctx.JSON(200, gin.H{
 			"status":  200,
 			"message": "Created",

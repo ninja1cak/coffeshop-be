@@ -16,4 +16,6 @@ func auth(g *gin.Engine, d *sqlx.DB) {
 	handler := handlers.NewAuth(repo)
 
 	router.POST("/login", handler.Login)
+	router.GET("/auth/:token", handler.VerifyAccount)
+
 }

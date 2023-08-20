@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"ninja1cak/coffeshop-be/config"
 	"ninja1cak/coffeshop-be/internal/models"
 	"ninja1cak/coffeshop-be/internal/repositories"
 	"ninja1cak/coffeshop-be/pkg"
@@ -42,19 +43,16 @@ func (h *HandlerProduct) PostDataProduct(ctx *gin.Context) {
 		return
 	}
 
-	response, err := h.CreateProduct(&product, &productSize)
+	data, err := h.CreateProduct(&product, &productSize)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  http.StatusBadRequest,
-			"message": ctx.Error(err),
-		})
+		pkg.NewResponse(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
+		return
 
 	} else {
-		ctx.JSON(200, gin.H{
-			"status":  200,
-			"message": "Created",
-			"data":    response,
-		})
+		pkg.NewResponse(200, data).Send(ctx)
+
 	}
 
 }
