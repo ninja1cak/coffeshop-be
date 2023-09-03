@@ -13,10 +13,11 @@ import (
 )
 
 type HandlerUser struct {
-	*repositories.RepoUser
+	// *repositories.RepoUser
+	repositories.RepoUserIF
 }
 
-func NewUser(r *repositories.RepoUser) *HandlerUser {
+func NewUser(r repositories.RepoUserIF) *HandlerUser {
 	return &HandlerUser{r}
 }
 
@@ -69,7 +70,6 @@ func (h *HandlerUser) PostDataUser(ctx *gin.Context) {
 			"data":    response,
 		})
 	}
-
 }
 
 func (h *HandlerUser) GetDataUser(ctx *gin.Context) {
@@ -143,14 +143,6 @@ func (h *HandlerUser) DeleteDataUser(ctx *gin.Context) {
 	var user models.User
 
 	user.Email = ctx.MustGet("email").(string)
-
-	if err := ctx.ShouldBind(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"status":  http.StatusBadRequest,
-			"message": ctx.Error(err),
-		})
-		return
-	}
 
 	response, err := h.DeleteUser(&user)
 	if err != nil {

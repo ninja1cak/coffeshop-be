@@ -13,6 +13,15 @@ type RepoUser struct {
 	*sqlx.DB
 }
 
+type RepoUserIF interface {
+	CreateUser(data *models.User) (string, error)
+	GetUser(user_id string) (*[]models.User, error)
+	UpdateUser(data *models.User) (string, error)
+	DeleteUser(data *models.User) (string, error)
+	GetAuthData(email string) (*models.User, error)
+	UpdateStatusUser(email string) (string, error)
+}
+
 func NewUser(db *sqlx.DB) *RepoUser {
 	return &RepoUser{db}
 }
@@ -44,7 +53,7 @@ func (r *RepoUser) CreateUser(data *models.User) (string, error) {
 	return "user success created", nil
 }
 
-func (r *RepoUser) GetUser(user_id string) (interface{}, error) {
+func (r *RepoUser) GetUser(user_id string) (*[]models.User, error) {
 	var queryId string = ""
 	var err error
 	if user_id != "" {
@@ -66,16 +75,16 @@ FROM
 	if user_id == "" {
 
 		if err = r.Select(&data, query); err != nil {
-			return "", err
+			return nil, err
 		}
 	} else {
 		if err = r.Select(&data, query, user_id); err != nil {
-			return "", err
+			return nil, err
 		}
 	}
 	log.Println(data)
 
-	return data, nil
+	return &data, nil
 }
 
 func (r *RepoUser) UpdateUser(data *models.User) (string, error) {
