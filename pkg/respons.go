@@ -12,6 +12,7 @@ type Response struct {
 	Description interface{} `json:"description,omitempty"`
 	Meta        interface{} `json:"meta,omitempty"`
 	Data        interface{} `json:"data,omitempty"`
+	Message     interface{} `json:"message,omitempty"`
 }
 
 func (r *Response) Send(ctx *gin.Context) {
@@ -22,9 +23,9 @@ func (r *Response) Send(ctx *gin.Context) {
 
 func NewResponse(code int, data *config.Result) *Response {
 	respon := Response{
-		Code:        code,
-		Status:      code,
-		Description: getStatus(code),
+		Code:    code,
+		Status:  code,
+		Message: getStatus(code),
 	}
 
 	if respon.Code >= 400 {
